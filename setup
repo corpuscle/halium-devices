@@ -204,6 +204,7 @@ else
         done
     fi
 
+    pwd
     if [ -d device/oppo/common/keyhandler ]; then
 	rm -rf device/oppo/common/keyhandler
     fi
