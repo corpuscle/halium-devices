@@ -204,9 +204,9 @@ else
         done
     fi
 
-    pwd
-    if [ -d device/oppo/common/keyhandler ]; then
-	rm -rf device/oppo/common/keyhandler
+    cd ../..
+    if [ -d oppo/common/keyhandler ]; then
+	rm -rf oppo/common/keyhandler
     fi
     echo "*******************************************"
 fi
