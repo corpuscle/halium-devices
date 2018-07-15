@@ -203,5 +203,9 @@ else
             fi
         done
     fi
+
+    if [ -d device/oppo/common/keyhandler ]; then
+	rm -rf device/oppo/common/keyhandler
+    fi
     echo "*******************************************"
 fi
