@@ -1,5 +1,12 @@
 #!/bin/bash
 
+function removeUnneededFolders {
+    rm -rf [Cc][Mm]actions
+    rm -rf [Ll]inage[Aa]ctions
+    rm -rf [Dd]oze
+    rm -rf [Kk]ey[Hh]andler
+}
+
 DEVICE=${1:=${DEVICE}}
 JOBS=${JOBS:=12}
 ARGS=($@)
@@ -44,6 +51,14 @@ else
     # DEVICE_COMMON_TEMP and loop through them later.
     DEVICE_COMMON_TEMP=$(ls -d $REPO_ROOT/device/$VENDOR/*common* 2>/dev/null | rev | cut -d "/" -f1 | rev)
     VENDOR_COMMON_TEMP=$(ls -d $REPO_ROOT/vendor/$VENDOR/*common* 2>/dev/null | rev | cut -d "/" -f1 | rev)
+
+    # OnePlus uses the device/oppo/common instead of expected device/oneplus/common for some targets.
+    # We use a small workaround in order to catch these as well.
+    if [ $VENDOR="oneplus" ]; then
+        DEVICE_COMMON_TEMP2=$(ls -d $REPO_ROOT/device/oppo/*common* 2>/dev/null | rev | cut -d "/" -f1 | rev)
+        VENDOR2="oppo"
+    fi
+
     DEVICE_TREE=$REPO_ROOT/device/$VENDOR/$DEVICE
     VENDOR_TREE=$REPO_ROOT/vendor/$VENDOR
 
@@ -56,6 +71,9 @@ else
                 echo "I: Processing proprietary blob file: device/$VENDOR/$DEVICE/$i"
                 grep -r -v -E '(^.*\.{1}(jar|apk)[|]?.*)' $i >$i".tmp" && mv $i".tmp" $i
             done
+            # Set executable bit, needed for some device trees
+            chmod +x ./setup-makefiles.sh
+            # Actually run the script
             ./setup-makefiles.sh
         )
     fi
@@ -72,13 +90,7 @@ else
     # such as CMActions/LineageActions, KeyHandler and Doze. Simply removing the folder will disable them.
     cd $DEVICE_TREE
     echo "I: Removing components relying on SettingsLib from: device/$VENDOR/$DEVICE"
-    rm -rf cmactions
-    rm -rf CMActions
-    rm -rf LineageActions
-    rm -rf doze
-    rm -rf Doze
-    rm -rf keyhandler
-    rm -rf KeyHandler
+    removeUnneededFolders
 
     # Loop through values in $DEVICE_COMMON_TEMP
     if [ -n "$DEVICE_COMMON_TEMP" ]; then
@@ -103,6 +115,9 @@ else
                         echo "I: Processing proprietary blob file: device/$VENDOR/$k/$l"
                         grep -r -v -E '(^.*\.{1}(jar|apk)[|]?.*)' $l >$l".tmp" && mv $l".tmp" $l
                     done
+                    # Set executable bit, needed for some device trees
+                    chmod +x ./setup-makefiles.sh
+                    # Actually run the script
                     ./setup-makefiles.sh
                 )
             fi
@@ -119,13 +134,7 @@ else
             # such as CMActions/LineageActions, KeyHandler and Doze. Simply removing the folder will disable them.
             cd $DEVICE_COMMON_TREE
             echo "I: Removing components relying on SettingsLib from: device/$VENDOR/$k"
-            rm -rf cmactions
-            rm -rf CMActions
-            rm -rf LineageActions
-            rm -rf doze
-            rm -rf Doze
-            rm -rf keyhandler
-            rm -rf KeyHandler
+            removeUnneededFolders
 
             # Since we can have multiple common repos we need to make sure to set
             # back the original values in case they exist. Otherwise unset the value.
@@ -139,6 +148,20 @@ else
             else
                 unset PLATFORM_COMMON
             fi
+        done
+    fi
+
+    # Loop through values in $DEVICE_COMMON_TEMP2 for certain OnePlus target
+    if [ -n "$DEVICE_COMMON_TEMP2" ]; then
+        for k in $DEVICE_COMMON_TEMP2; do
+            echo "I: Procession device vendor common folder: device/$VENDOR2/$k"
+            DEVICE_COMMON_TREE2=$REPO_ROOT/device/$VENDOR2/$k
+
+            # Since we don't have SettingsLib, remove components that rely on it (which we therefore also don't use)
+            # such as CMActions/LineageActions, KeyHandler and Doze. Simply removing the folder will disable them.
+            cd $DEVICE_COMMON_TREE2
+            echo "I: Removing components relying on SettingsLib from: device/$VENDOR2/$k"
+            removeUnneededFolders
         done
     fi
 
@@ -165,6 +188,9 @@ else
                         echo "I: Processing proprietary blob file: $VENDOR_COMMON_TREE/$l"
                         grep -r -v -E '(^.*\.{1}(jar|apk)[|]?.*)' $l >$l".tmp" && mv $l".tmp" $l
                     done
+                    # Set executable bit, needed for some device trees
+                    chmod +x ./setup-makefiles.sh
+                    # Actually run the script
                     ./setup-makefiles.sh
                 )
             fi
@@ -181,13 +207,7 @@ else
             # such as CMActions/LineageActions, KeyHandler and Doze. Simply removing the folder will disable them.
             cd $VENDOR_COMMON_TREE
             echo "I: Removing components relying on SettingsLib from: device/$VENDOR/$k"
-            rm -rf cmactions
-            rm -rf CMActions
-            rm -rf LineageActions
-            rm -rf doze
-            rm -rf Doze
-            rm -rf keyhandler
-            rm -rf KeyHandler
+            removeUnneededFolders
 
             # Since we can have multiple common repos we need to make sure to set
             # back the original values in case they exist. Otherwise unset the value.
