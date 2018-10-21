@@ -4,7 +4,7 @@
     <remove-project name="ubports/android_hardware_libhardware" />
     <project path="hardware/libhardware" name="android_hardware_libhardware" groups="pdk" remote="cm" />
 
-    <project path="device/lge/mako" name="ubports/android_device_lge_mako" remote="halium" revision="ubp-5.1" />
+    <project path="device/lge/mako" name="corpuscle/android_device_lge_mako" remote="halium" revision="ubp-5.1" />
 
     <project path="kernel/google/msm" name="ubports/android_kernel_google_msm" remote="halium" revision="ubp-5.1" />
 
