@@ -223,10 +223,5 @@ else
             fi
         done
     fi
-
-    cd ../..
-    if [ -d oppo/common/keyhandler ]; then
-	rm -rf oppo/common/keyhandler
-    fi
     echo "*******************************************"
 fi
